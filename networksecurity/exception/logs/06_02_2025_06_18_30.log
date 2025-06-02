@@ -1,0 +1,6 @@
+[2025-06-02 06:18:30,431] INFO [exception.py:64] - Enter the try block
+[2025-06-02 06:18:30,432] ERROR [exception.py:67] - Exception occurred
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\exception\exception.py", line 65, in <module>
+    x = 1 / 0  # Force an error
+ZeroDivisionError: division by zero
