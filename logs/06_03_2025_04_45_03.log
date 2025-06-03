@@ -1,0 +1,25 @@
+[2025-06-03 04:47:19,514] ERROR [push_data.py:92] - Exception occurred while inserting into MongoDB
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\push_data.py", line 81, in insert_data_to_mongodb
+    self.mongo_client = pymongo.MongoClient(MONGO_DB_URL, tlsCAFile=ca)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 884, in __init__
+    self._get_topology()  # type: ignore[unused-coroutine]
+    ^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1737, in _get_topology
+    self._resolve_srv()
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 903, in _resolve_srv
+    res = uri_parser._parse_srv(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\uri_parser.py", line 163, in _parse_srv
+    nodes = dns_resolver.get_hosts()
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 157, in get_hosts
+    _, nodes = self._get_srv_response_and_hosts(True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 131, in _get_srv_response_and_hosts
+    results = self._resolve_uri(encapsulate_errors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 125, in _resolve_uri
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The resolution lifetime expired after 21.182 seconds: Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.; Server Do53:192.168.12.235@53 answered The DNS operation timed out.

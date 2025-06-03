@@ -1,0 +1,27 @@
+[2025-06-02 16:54:49,474] ERROR [push_data.py:92] - Exception occurred while inserting into MongoDB
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\push_data.py", line 88, in insert_data_to_mongodb
+    self.collection.insert_many(self.records)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\collection.py", line 589, in insert_many
+    blk.execute(write_concern, session=session)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\bulk.py", line 448, in execute
+    return self.execute_command(generator, write_concern, session)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\bulk.py", line 343, in execute_command
+    with client._tmp_session(session) as s:
+  File "D:\Projects\NETWORKSECURITY\venv\lib\contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\mongo_client.py", line 1616, in _tmp_session
+    s = self._ensure_session(session)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\mongo_client.py", line 1603, in _ensure_session
+    return self.__start_session(True, causal_consistency=False)
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\mongo_client.py", line 1553, in __start_session
+    server_session = self._get_server_session()
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\mongo_client.py", line 1589, in _get_server_session
+    return self._topology.get_server_session()
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\topology.py", line 530, in get_server_session
+    session_timeout = self._check_session_support()
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\topology.py", line 514, in _check_session_support
+    self._select_servers_loop(
+  File "D:\Projects\NETWORKSECURITY\venv\lib\site-packages\pymongo\topology.py", line 216, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: SSL handshake failed: ac-d1v4l9p-shard-00-00.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997),SSL handshake failed: ac-d1v4l9p-shard-00-01.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997),SSL handshake failed: ac-d1v4l9p-shard-00-02.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997), Timeout: 30s, Topology Description: <TopologyDescription id: 683e39aba694d7f8840ecd6a, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-d1v4l9p-shard-00-00.l0fwss3.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-d1v4l9p-shard-00-00.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997)')>, <ServerDescription ('ac-d1v4l9p-shard-00-01.l0fwss3.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-d1v4l9p-shard-00-01.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997)')>, <ServerDescription ('ac-d1v4l9p-shard-00-02.l0fwss3.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('SSL handshake failed: ac-d1v4l9p-shard-00-02.l0fwss3.mongodb.net:27017: [SSL: TLSV1_ALERT_INTERNAL_ERROR] tlsv1 alert internal error (_ssl.c:997)')>]>
