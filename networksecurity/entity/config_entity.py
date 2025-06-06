@@ -159,3 +159,45 @@ class DataValidationConfig:
             training_pipeline.DATA_VALIDATION_DRIFT_REPORT_DIR,
             training_pipeline.DATA_VALIDATION_DRIFT_REPORT_FILE_NAME
         )
+# ========================================================================================
+# DataTransformationConfig: Configuration class for transforming raw, train, and test data
+# ========================================================================================
+
+class DataTransformationConfig:
+    """
+    Configuration class for managing file paths and directory structure related to 
+    the data transformation phase of the ML pipeline.
+
+    Attributes:
+        data_transformation_dir (str): Base directory for all data transformation artifacts.
+        transformed_train_file_path (str): Path to the transformed training dataset (.npy format).
+        transformed_test_file_path (str): Path to the transformed testing dataset (.npy format).
+        transformed_object_file_path (str): Path to the serialized preprocessing object (e.g., imputer, scaler).
+    """
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        # Directory where all transformation artifacts will be stored
+        self.data_transformation_dir: str = os.path.join(
+            training_pipeline_config.artifact_dir,
+            training_pipeline.DATA_TRANSFORMATION_DIR_NAME
+        )
+
+        # Path for the transformed training data file (converted from .csv to .npy)
+        self.transformed_train_file_path: str = os.path.join(
+            self.data_transformation_dir,
+            training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR,
+            training_pipeline.TRAIN_FILE_NAME.replace("csv", "npy")
+        )
+
+        # Path for the transformed testing data file (converted from .csv to .npy)
+        self.transformed_test_file_path: str = os.path.join(
+            self.data_transformation_dir,
+            training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR,
+            training_pipeline.TEST_FILE_NAME.replace("csv", "npy")
+        )
+
+        # Path to save the preprocessing object used for transforming the data
+        self.transformed_object_file_path: str = os.path.join(
+            self.data_transformation_dir,
+            training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR,
+            training_pipeline.PREPROCESSING_OBJECT_FILE_NAME
+        )

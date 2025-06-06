@@ -77,3 +77,33 @@ DATA_VALIDATION_DRIFT_REPORT_DIR: str = "drift_report"
 
 # File name of the generated data drift report (YAML format)
 DATA_VALIDATION_DRIFT_REPORT_FILE_NAME: str = "report.yaml"
+
+
+# ============================
+# Data Transformation Imputer
+# ============================
+
+# Directory name for storing all data transformation-related artifacts
+DATA_TRANSFORMATION_DIR_NAME: str = "data_transformation"
+
+# Subdirectory to store transformed data (typically after preprocessing)
+DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR: str = "transformed"
+
+# Subdirectory to store serialized transformation objects like scalers or imputers
+DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR: str = "transformed_object"
+
+# =====================================
+# KNN imputer parameters for missing values
+# =====================================
+# Dictionary containing parameters for the KNN imputer:
+# - missing_values: the placeholder for missing values (np.nan in this case)
+# - n_neighbors: number of neighboring samples to use for imputation
+# - weights: strategy to weight the neighbors ('uniform' means equal weight)
+DATA_TRANSFORMATION_IMPUTER_PARAMS: dict = {
+    "missing_values": np.nan,
+    "n_neighbors": 3,
+    "weights": "uniform"
+}
+
+# File name to save the fitted preprocessing object (e.g., scaler, encoder, imputer)
+PREPROCESSING_OBJECT_FILE_NAME = "preprocessing.pkl"
