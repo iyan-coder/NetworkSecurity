@@ -1,0 +1,26 @@
+[2025-06-05 17:46:50,967] INFO [data_ingestion.py:33] - DataIngestion initialized with config.
+[2025-06-05 17:46:50,968] INFO [main.py:14] - Initiate the data ingestion
+[2025-06-05 17:46:50,968] INFO [data_ingestion.py:132] - Starting data ingestion process.
+[2025-06-05 17:46:50,969] INFO [data_ingestion.py:44] - Connecting to MongoDB for data export.
+[2025-06-05 17:46:57,737] INFO [data_ingestion.py:49] - Connected to MongoDB: mongodb+srv://iyanuoluwaadebayo04:Admin234@cluster0.l0fwss3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+[2025-06-05 17:46:57,738] INFO [data_ingestion.py:52] - Accessing collection: Iyan-coder.NetworkData
+[2025-06-05 17:47:03,520] INFO [data_ingestion.py:55] - Fetched 11055 records from MongoDB collection: NetworkData
+[2025-06-05 17:47:03,529] INFO [data_ingestion.py:59] - Dropped _id column from DataFrame
+[2025-06-05 17:47:03,531] INFO [data_ingestion.py:62] - Final dataframe shape after cleaning: (11055, 31)
+[2025-06-05 17:47:03,537] INFO [data_ingestion.py:81] - Saving data to feature store path: Artifacts\06_05_2025_17_46_48\data_ingestion\feature_store\phisingData.csv
+[2025-06-05 17:47:03,704] INFO [data_ingestion.py:84] - Data exported to feature store at Artifacts\06_05_2025_17_46_48\data_ingestion\feature_store\phisingData.csv
+[2025-06-05 17:47:03,705] INFO [data_ingestion.py:101] - Splitting data into train and test sets.
+[2025-06-05 17:47:03,711] INFO [data_ingestion.py:107] - Train set shape: (8844, 31), Test set shape: (2211, 31)
+[2025-06-05 17:47:03,714] INFO [data_ingestion.py:111] - Saving train and test files to: Artifacts\06_05_2025_17_46_48\data_ingestion\ingested
+[2025-06-05 17:47:03,896] INFO [data_ingestion.py:116] - Train data saved to: Artifacts\06_05_2025_17_46_48\data_ingestion\ingested\train.csv
+[2025-06-05 17:47:03,897] INFO [data_ingestion.py:117] - Test data saved to: Artifacts\06_05_2025_17_46_48\data_ingestion\ingested\test.csv
+[2025-06-05 17:47:03,898] INFO [data_ingestion.py:147] - Data ingestion completed successfully.
+[2025-06-05 17:47:03,899] INFO [main.py:16] - Data Intiation Completed
+[2025-06-05 17:47:03,914] INFO [main.py:20] - Initiate the data Validaton
+[2025-06-05 17:47:03,987] INFO [data_validation.py:71] - Expected number of columns: 31
+[2025-06-05 17:47:03,987] INFO [data_validation.py:72] - Actual number of columns: 31
+[2025-06-05 17:47:03,988] INFO [data_validation.py:71] - Expected number of columns: 31
+[2025-06-05 17:47:03,988] INFO [data_validation.py:72] - Actual number of columns: 31
+[2025-06-05 17:47:03,991] INFO [data_validation.py:162] - Numerical columns found: ['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State', 'Domain_registeration_length', 'Favicon', 'port', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH', 'Submitting_to_email', 'Abnormal_URL', 'Redirect', 'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain', 'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page', 'Statistical_report', 'Result']
+[2025-06-05 17:47:03,993] INFO [data_validation.py:162] - Numerical columns found: ['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State', 'Domain_registeration_length', 'Favicon', 'port', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH', 'Submitting_to_email', 'Abnormal_URL', 'Redirect', 'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain', 'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page', 'Statistical_report', 'Result']
+[2025-06-05 17:47:04,500] INFO [main.py:22] - Data Validation Completed

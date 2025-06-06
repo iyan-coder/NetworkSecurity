@@ -1,20 +1,47 @@
-# ----------------------------------------------
-# This file defines the artifact object for data ingestion.
-# An artifact is an output/result from a pipeline stage that
-# can be passed to the next stage. This promotes modularity.
-# ----------------------------------------------
+# -------------------------------------------------------------
+# This file defines the artifact data classes for pipeline stages.
+# Artifacts are structured outputs from each stage in the ML pipeline.
+# They help track outputs and pass necessary data/configs downstream.
+# -------------------------------------------------------------
 
-from dataclasses import dataclass  # Automatically generates __init__, __repr__, __eq__, etc.
+from dataclasses import dataclass  # Provides a decorator and functions for automatically adding special methods
 
-@dataclass  # Declares a simple class to hold structured data without writing boilerplate code
+
+# ========================================================
+# DataIngetionArtifact: Holds paths to split data outputs
+# ========================================================
+@dataclass  # Simplifies the creation of classes for storing data
 class DataIngetionArtifact:
     """
-    DataIngetionArtifact holds the output of the data ingestion process.
-    
-    Attributes:
-        trained_file_path (str): File path to the training dataset saved after the train-test split.
-        test_file_path (str): File path to the testing dataset saved after the train-test split.
-    """
+    Artifact class for the data ingestion step.
 
-    trained_file_path: str  # ✅ Path to the CSV file containing the training data
-    test_file_path: str     # ✅ Path to the CSV file containing the testing data
+    Attributes:
+        trained_file_path (str): Path to the CSV file containing the training dataset.
+        test_file_path (str): Path to the CSV file containing the testing dataset.
+    """
+    trained_file_path: str  # ✅ File path to the training dataset after split
+    test_file_path: str     # ✅ File path to the testing dataset after split
+
+
+# ===================================================================
+# DataValidationArtifact: Holds output of the data validation process
+# ===================================================================
+@dataclass
+class DataValidationArtifact:
+    """
+    Artifact class for the data validation step.
+
+    Attributes:
+        validation_status (bool): Indicates if the validation was successful (True/False).
+        valid_train_file_path (str): Path to the validated training dataset.
+        valid_test_file_path (str): Path to the validated testing dataset.
+        invalid_train_file_path (str): Path to the invalid training dataset, if any.
+        invalid_test_file_path (str): Path to the invalid testing dataset, if any.
+        drift_report_file_path (str): Path to the saved data drift report (YAML).
+    """
+    validation_status: bool               # ✅ Was validation successful or not
+    valid_train_file_path: str            # ✅ Path to valid training data
+    valid_test_file_path: str             # ✅ Path to valid testing data
+    invalid_train_file_path: str          # ✅ Path to invalid training data (if validation fails)
+    invalid_test_file_path: str           # ✅ Path to invalid testing data (if validation fails)
+    drift_report_file_path: str           # ✅ Path to YAML file storing the drift detection report
