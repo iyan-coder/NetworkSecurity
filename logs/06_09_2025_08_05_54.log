@@ -1,0 +1,127 @@
+[2025-06-09 08:05:57,656] INFO [main.py:41] - Starting data ingestion...
+[2025-06-09 08:05:57,657] INFO [data_ingestion.py:33] - DataIngestion initialized with config.
+[2025-06-09 08:05:57,657] INFO [data_ingestion.py:132] - Starting data ingestion process.
+[2025-06-09 08:05:57,657] INFO [data_ingestion.py:44] - Connecting to MongoDB for data export.
+[2025-06-09 08:06:02,190] INFO [data_ingestion.py:49] - Connected to MongoDB: mongodb+srv://iyanuoluwaadebayo04:Admin234@cluster0.l0fwss3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+[2025-06-09 08:06:02,193] INFO [data_ingestion.py:52] - Accessing collection: Iyan-coder.NetworkData
+[2025-06-09 08:06:09,942] INFO [data_ingestion.py:55] - Fetched 11055 records from MongoDB collection: NetworkData
+[2025-06-09 08:06:09,951] INFO [data_ingestion.py:59] - Dropped _id column from DataFrame
+[2025-06-09 08:06:09,953] INFO [data_ingestion.py:62] - Final dataframe shape after cleaning: (11055, 31)
+[2025-06-09 08:06:09,959] INFO [data_ingestion.py:81] - Saving data to feature store path: Artifacts\06_09_2025_08_05_55\data_ingestion\feature_store\phisingData.csv
+[2025-06-09 08:06:10,124] INFO [data_ingestion.py:84] - Data exported to feature store at Artifacts\06_09_2025_08_05_55\data_ingestion\feature_store\phisingData.csv
+[2025-06-09 08:06:10,125] INFO [data_ingestion.py:101] - Splitting data into train and test sets.
+[2025-06-09 08:06:10,131] INFO [data_ingestion.py:107] - Train set shape: (8844, 31), Test set shape: (2211, 31)
+[2025-06-09 08:06:10,134] INFO [data_ingestion.py:111] - Saving train and test files to: Artifacts\06_09_2025_08_05_55\data_ingestion\ingested
+[2025-06-09 08:06:10,299] INFO [data_ingestion.py:116] - Train data saved to: Artifacts\06_09_2025_08_05_55\data_ingestion\ingested\train.csv
+[2025-06-09 08:06:10,300] INFO [data_ingestion.py:117] - Test data saved to: Artifacts\06_09_2025_08_05_55\data_ingestion\ingested\test.csv
+[2025-06-09 08:06:10,301] INFO [data_ingestion.py:147] - Data ingestion completed successfully.
+[2025-06-09 08:06:10,302] INFO [main.py:45] - Data ingestion completed.
+[2025-06-09 08:06:10,303] INFO [main.py:51] - Starting data validation...
+[2025-06-09 08:06:10,398] INFO [data_validation.py:86] - Expected columns count: 31
+[2025-06-09 08:06:10,399] INFO [data_validation.py:87] - Actual columns count: 31
+[2025-06-09 08:06:10,399] INFO [data_validation.py:86] - Expected columns count: 31
+[2025-06-09 08:06:10,400] INFO [data_validation.py:87] - Actual columns count: 31
+[2025-06-09 08:06:10,403] INFO [data_validation.py:165] - Numerical columns found: ['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State', 'Domain_registeration_length', 'Favicon', 'port', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH', 'Submitting_to_email', 'Abnormal_URL', 'Redirect', 'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain', 'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page', 'Statistical_report', 'Result']
+[2025-06-09 08:06:10,406] INFO [data_validation.py:165] - Numerical columns found: ['having_IP_Address', 'URL_Length', 'Shortining_Service', 'having_At_Symbol', 'double_slash_redirecting', 'Prefix_Suffix', 'having_Sub_Domain', 'SSLfinal_State', 'Domain_registeration_length', 'Favicon', 'port', 'HTTPS_token', 'Request_URL', 'URL_of_Anchor', 'Links_in_tags', 'SFH', 'Submitting_to_email', 'Abnormal_URL', 'Redirect', 'on_mouseover', 'RightClick', 'popUpWidnow', 'Iframe', 'age_of_domain', 'DNSRecord', 'web_traffic', 'Page_Rank', 'Google_Index', 'Links_pointing_to_page', 'Statistical_report', 'Result']
+[2025-06-09 08:06:10,920] INFO [main.py:55] - Data validation completed.
+[2025-06-09 08:06:10,922] INFO [main.py:61] - Starting data transformation...
+[2025-06-09 08:06:10,922] INFO [data_transformation.py:61] - Entered initiate_data_transformation method of DataTransformation class
+[2025-06-09 08:06:11,008] INFO [data_transformation.py:44] - Entered get_data_transformer_object method of Transformation class
+[2025-06-09 08:06:11,009] INFO [data_transformation.py:48] - Initialized KNNImputer with {'missing_values': nan, 'n_neighbors': 3, 'weights': 'uniform'}
+[2025-06-09 08:06:11,050] INFO [utils.py:116] - Entered the save_object method of MainUtils class
+[2025-06-09 08:06:11,059] INFO [utils.py:125] - Exited the save_object method of MainUtils class
+[2025-06-09 08:06:11,063] INFO [main.py:65] - Data transformation completed.
+[2025-06-09 08:06:11,065] INFO [main.py:71] - Starting Model Trainer...
+[2025-06-09 08:06:11,192] INFO [model_trainer.py:230] - Entered initiate_model_trainer method of ModelTrainer class
+[2025-06-09 08:06:11,192] INFO [utils.py:183] - Loading numpy array from file: Artifacts\06_09_2025_08_05_55\data_transformation\transformed\train.npy
+[2025-06-09 08:06:11,196] INFO [utils.py:186] - Successfully loaded numpy array from file: Artifacts\06_09_2025_08_05_55\data_transformation\transformed\train.npy
+[2025-06-09 08:06:11,197] INFO [utils.py:183] - Loading numpy array from file: Artifacts\06_09_2025_08_05_55\data_transformation\transformed\test.npy
+[2025-06-09 08:06:11,200] INFO [utils.py:186] - Successfully loaded numpy array from file: Artifacts\06_09_2025_08_05_55\data_transformation\transformed\test.npy
+[2025-06-09 08:06:11,200] INFO [model_trainer.py:182] - Training and evaluating models...
+[2025-06-09 08:06:11,201] INFO [utils.py:229] - Starting model evaluation and hyperparameter tuning...
+[2025-06-09 08:06:11,202] INFO [utils.py:233] - Evaluating model: Decision Tree
+[2025-06-09 08:06:11,578] INFO [utils.py:243] - Best parameters for Decision Tree: {'criterion': 'log_loss'}
+[2025-06-09 08:06:11,622] INFO [utils.py:254] - Accuracy for model Decision Tree: 0.9611
+[2025-06-09 08:06:11,624] INFO [utils.py:233] - Evaluating model: Random Forest
+[2025-06-09 08:06:25,641] INFO [utils.py:243] - Best parameters for Random Forest: {'n_estimators': 256}
+[2025-06-09 08:06:28,308] INFO [utils.py:254] - Accuracy for model Random Forest: 0.9697
+[2025-06-09 08:06:28,309] INFO [utils.py:233] - Evaluating model: Gradient Boosting
+[2025-06-09 08:12:56,177] INFO [utils.py:243] - Best parameters for Gradient Boosting: {'learning_rate': 0.1, 'n_estimators': 256, 'subsample': 0.7}
+[2025-06-09 08:12:59,765] INFO [utils.py:254] - Accuracy for model Gradient Boosting: 0.9566
+[2025-06-09 08:12:59,766] INFO [utils.py:233] - Evaluating model: Logistic Regression
+[2025-06-09 08:13:00,150] INFO [utils.py:243] - Best parameters for Logistic Regression: {}
+[2025-06-09 08:13:00,229] INFO [utils.py:254] - Accuracy for model Logistic Regression: 0.9222
+[2025-06-09 08:13:00,229] INFO [utils.py:233] - Evaluating model: AdaBoost
+[2025-06-09 08:13:59,301] INFO [utils.py:243] - Best parameters for AdaBoost: {'learning_rate': 0.1, 'n_estimators': 256}
+[2025-06-09 08:14:03,198] INFO [utils.py:254] - Accuracy for model AdaBoost: 0.9204
+[2025-06-09 08:14:03,198] INFO [utils.py:265] - Completed model evaluation for all candidates.
+[2025-06-09 08:14:03,199] INFO [model_trainer.py:104] - Best model selected: Random Forest with accuracy: 0.9696969696969697
+[2025-06-09 08:14:04,630] ERROR [classification_metric.py:40] - Failed to get classification metrics
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py", line 29, in get_classification_score
+    classification_metric = ClassficationMetricArtifact(
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score'
+[2025-06-09 08:14:04,638] ERROR [model_trainer.py:219] - Training pipeline failed.
+[2025-06-09 08:14:04,639] ERROR [model_trainer.py:247] - Model Trainer process failed.
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py", line 29, in get_classification_score
+    classification_metric = ClassficationMetricArtifact(
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 197, in train_model
+    classification_train_metric = get_classification_score(y_true=y_train, y_pred=y_train_pred, y_proba=y_train_proba)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py", line 41, in get_classification_score
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: [ERROR] ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score' | File: D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py, Line: 29
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 241, in initiate_model_trainer
+    model_trainer_artifact = self.train_model(X_train, y_train, X_test, y_test)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 220, in train_model
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: [ERROR] [ERROR] ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score' | File: D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py, Line: 29 | File: D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py, Line: 197
+[2025-06-09 08:14:04,683] ERROR [main.py:81] - Pipeline execution failed.
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py", line 29, in get_classification_score
+    classification_metric = ClassficationMetricArtifact(
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 197, in train_model
+    classification_train_metric = get_classification_score(y_true=y_train, y_pred=y_train_pred, y_proba=y_train_proba)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py", line 41, in get_classification_score
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: [ERROR] ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score' | File: D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py, Line: 29
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 241, in initiate_model_trainer
+    model_trainer_artifact = self.train_model(X_train, y_train, X_test, y_test)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 220, in train_model
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: [ERROR] [ERROR] ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score' | File: D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py, Line: 29 | File: D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py, Line: 197
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Projects\NETWORKSECURITY\main.py", line 74, in <module>
+    model_trainer_artifact = model_trainer.initiate_model_trainer()
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py", line 248, in initiate_model_trainer
+    raise NetworkSecurityException(e, sys)
+networksecurity.exception.exception.NetworkSecurityException: [ERROR] [ERROR] [ERROR] ClassficationMetricArtifact.__init__() got an unexpected keyword argument 'accuracy_score' | File: D:\Projects\NETWORKSECURITY\networksecurity\utils\ml_utils\metric\classification_metric.py, Line: 29 | File: D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py, Line: 197 | File: D:\Projects\NETWORKSECURITY\networksecurity\components\model_trainer.py, Line: 241

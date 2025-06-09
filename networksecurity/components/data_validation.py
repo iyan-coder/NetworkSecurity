@@ -14,8 +14,14 @@ from networksecurity.utils.main_utils.utils import read_yaml_file, write_yaml_fi
 
 class DataValidation:
     """
-    This class handles all aspects of data validation including schema checks,
-    numerical column existence, and data drift detection.
+    DataValidation handles validation of ingested data against a schema and checks
+    for data drift between training and testing datasets.
+
+    Key Responsibilities:
+    - Validate the number of columns matches the schema.
+    - Confirm numerical columns exist.
+    - Detect distributional changes (data drift) using Kolmogorov-Smirnov test.
+    - Save validated datasets and generate drift reports.
     """
 
     def __init__(
@@ -24,15 +30,19 @@ class DataValidation:
         data_validation_config: DataValidationConfig
     ):
         """
-        Initializes the DataValidation object by loading schema configuration and artifacts.
+        Initializes the DataValidation instance by loading:
+        - Data ingestion artifact containing file paths to datasets.
+        - Validation configuration including output file paths.
+        - Schema configuration from a YAML file.
 
         Args:
-            data_ingestion_artifact (DataIngetionArtifact): Contains paths to training and testing data.
-            data_validation_config (DataValidationConfig): Contains configurations for data validation.
+            data_ingestion_artifact (DataIngetionArtifact): Paths for train/test CSV files.
+            data_validation_config (DataValidationConfig): Paths for validation outputs.
         """
         try:
             self.data_ingestion_artifact = data_ingestion_artifact
             self.data_validation_config = data_validation_config
+            # Load expected schema (column names and types) from YAML file
             self._schema_config = read_yaml_file(SCHEMA_FILE_PATH)
         except Exception as e:
             logger.error("Error during DataValidation initialization", exc_info=True)
@@ -41,13 +51,16 @@ class DataValidation:
     @staticmethod
     def read_data(file_path: str) -> pd.DataFrame:
         """
-        Reads CSV file into a pandas DataFrame.
+        Reads a CSV file into a pandas DataFrame.
 
         Args:
-            file_path (str): Path to the CSV file.
+            file_path (str): Location of CSV file.
 
         Returns:
-            pd.DataFrame: Loaded DataFrame.
+            pd.DataFrame: Loaded dataset.
+
+        Raises:
+            NetworkSecurityException: If file reading fails.
         """
         try:
             return pd.read_csv(file_path)
@@ -57,21 +70,23 @@ class DataValidation:
 
     def validate_number_of_columns(self, dataframe: pd.DataFrame) -> bool:
         """
-        Validates that the number of columns in the DataFrame matches the schema.
+        Checks if the dataframe contains the exact number of columns as defined in the schema.
 
         Args:
             dataframe (pd.DataFrame): DataFrame to validate.
 
         Returns:
-            bool: True if column count matches, False otherwise.
+            bool: True if columns count matches, False otherwise.
         """
         try:
             expected_columns = self._schema_config["columns"]
-            number_of_columns = len(expected_columns)
-            logger.info(f"Expected number of columns: {number_of_columns}")
-            logger.info(f"Actual number of columns: {len(dataframe.columns)}")
+            expected_num_cols = len(expected_columns)
+            actual_num_cols = len(dataframe.columns)
 
-            return len(dataframe.columns) == number_of_columns
+            logger.info(f"Expected columns count: {expected_num_cols}")
+            logger.info(f"Actual columns count: {actual_num_cols}")
+
+            return actual_num_cols == expected_num_cols
 
         except Exception as e:
             logger.error("Failed to validate number of columns", exc_info=True)
@@ -79,83 +94,70 @@ class DataValidation:
 
     def detect_dataset_drift(self, base_df: pd.DataFrame, current_df: pd.DataFrame, threshold: float = 0.05) -> bool:
         """
-        Detects dataset drift between base and current datasets using the KS test.
+        Detects data drift by comparing distributions of numerical columns between
+        a base dataset (training) and a current dataset (testing) using KS test.
 
         Args:
-            base_df (pd.DataFrame): Reference dataset (typically training).
-            current_df (pd.DataFrame): Current dataset (typically testing).
-            threshold (float): P-value threshold for detecting drift.
+            base_df (pd.DataFrame): Reference dataset (usually training).
+            current_df (pd.DataFrame): Dataset to compare against base.
+            threshold (float): Significance level for p-value to flag drift (default 0.05).
 
         Returns:
-            bool: True if no drift detected, False otherwise.
+            bool: True if no drift detected (all p-values > threshold), False if drift found.
+
+        Raises:
+            NetworkSecurityException: If drift detection process fails.
         """
         try:
-            # Initialize drift status as True, assuming no drift unless detected
-            status = True
+            # Assume no drift initially
+            validation_status = True
+            drift_report = {}
 
-            # Create an empty dictionary to store drift test results per column
-            report = {}
-
-            # Ensure both dataframes (train/test) have the same column structure
+            # Check columns are identical before comparison
             assert base_df.columns.equals(current_df.columns), "Train and test columns do not match"
 
-            # Iterate through each column for drift detection
             for column in base_df.columns:
+                # Drop missing values to avoid errors
+                base_col = base_df[column].dropna()
+                curr_col = current_df[column].dropna()
 
-                # Drop any missing values to avoid errors during statistical testing
-                d1 = base_df[column].dropna()
-                d2 = current_df[column].dropna()
+                # Only test numeric columns (skip categorical/string)
+                if pd.api.types.is_numeric_dtype(base_col):
+                    # KS test compares distribution similarity
+                    ks_result = ks_2samp(base_col, curr_col)
+                    p_value = ks_result.pvalue
 
-                # Only apply KS test to numerical columns
-                if pd.api.types.is_numeric_dtype(d1):
-                
-                    # Perform the two-sample Kolmogorov–Smirnov test to compare distributions
-                    ks_test_result = ks_2samp(d1, d2)
-
-                    # Extract the p-value from the test result
-                    p_value = ks_test_result.pvalue
-
-                    # If p-value is less than the threshold (default 0.05), consider it drift
+                    # Drift if p-value < threshold (distributions differ significantly)
                     drift_detected = p_value < threshold
 
-                    # Store results for this column in the drift report
-                report[column] = {
-                    "p_value": float(p_value),
-                    "drift_status": bool(drift_detected)   # 👈 cast to native bool
+                    drift_report[column] = {
+                        "p_value": float(p_value),
+                        "drift_status": bool(drift_detected)
                     }
 
+                    if drift_detected:
+                        validation_status = False
 
-                # If any column has drift, set status to False
-                if drift_detected:
-                    status = False
+            # Save drift report YAML file for monitoring
+            drift_report_path = self.data_validation_config.drift_report_file_path
+            os.makedirs(os.path.dirname(drift_report_path), exist_ok=True)
+            write_yaml_file(file_path=drift_report_path, content=drift_report)
 
-            # Get the path where the drift report should be saved
-            drift_report_file_path = self.data_validation_config.drift_report_file_path
+            return validation_status
 
-            # Ensure the directory for the report exists
-            os.makedirs(os.path.dirname(drift_report_file_path), exist_ok=True)
-
-            # Write the report dictionary to a YAML file
-            write_yaml_file(file_path=drift_report_file_path, content=report)
-
-            # Return the overall validation status (True = no drift, False = drift detected)
-            return status
-        
         except Exception as e:
-            logger.error("Failed to detect dataset drift")
-            # Wrap and raise any exceptions with custom error handling
+            logger.error("Failed to detect dataset drift", exc_info=True)
             raise NetworkSecurityException(e, sys)
-
 
     def is_numerical_columns_exist(self, dataframe: pd.DataFrame) -> bool:
         """
-        Checks if the dataset contains any numerical columns.
+        Validates the existence of at least one numerical column in the dataset.
 
         Args:
-            dataframe (pd.DataFrame): The DataFrame to check.
+            dataframe (pd.DataFrame): Dataset to check.
 
         Returns:
-            bool: True if numerical columns exist, False otherwise.
+            bool: True if numerical columns are present, False otherwise.
         """
         numerical_cols = dataframe.select_dtypes(include=['number']).columns
 
@@ -168,40 +170,50 @@ class DataValidation:
 
     def initiate_data_validation(self) -> DataValidationArtifact:
         """
-        Orchestrates the full data validation pipeline.
+        Executes the complete data validation process:
+        - Reads train/test data.
+        - Validates schema.
+        - Checks for numerical columns.
+        - Detects data drift.
+        - Saves validated datasets.
+        - Returns an artifact summarizing validation status and file paths.
 
         Returns:
-            DataValidationArtifact: Artifact object summarizing the validation results.
+            DataValidationArtifact: Contains validation status and file paths for
+            valid/invalid datasets and drift report.
+
+        Raises:
+            NetworkSecurityException: If validation fails at any step.
         """
         try:
             train_file_path = self.data_ingestion_artifact.trained_file_path
             test_file_path = self.data_ingestion_artifact.test_file_path
 
-            # Load data
-            train_dataframe = DataValidation.read_data(train_file_path)
-            test_dataframe = DataValidation.read_data(test_file_path)
+            # Load datasets
+            train_df = DataValidation.read_data(train_file_path)
+            test_df = DataValidation.read_data(test_file_path)
 
             # Schema validation
-            if not self.validate_number_of_columns(train_dataframe):
-                raise NetworkSecurityException("Train dataframe does not contain all expected columns.", sys)
-            if not self.validate_number_of_columns(test_dataframe):
-                raise NetworkSecurityException("Test dataframe does not contain all expected columns.", sys)
+            if not self.validate_number_of_columns(train_df):
+                raise NetworkSecurityException("Train dataframe column count mismatch.", sys)
+            if not self.validate_number_of_columns(test_df):
+                raise NetworkSecurityException("Test dataframe column count mismatch.", sys)
 
-            # Numerical column check
-            if not self.is_numerical_columns_exist(train_dataframe):
+            # Check numerical columns existence
+            if not self.is_numerical_columns_exist(train_df):
                 raise NetworkSecurityException("Train dataframe lacks numerical columns.", sys)
-            if not self.is_numerical_columns_exist(test_dataframe):
+            if not self.is_numerical_columns_exist(test_df):
                 raise NetworkSecurityException("Test dataframe lacks numerical columns.", sys)
 
-            # Drift detection
-            validation_status = self.detect_dataset_drift(train_dataframe, test_dataframe)
+            # Detect data drift between train and test sets
+            validation_status = self.detect_dataset_drift(train_df, test_df)
 
-            # Save validated data
+            # Save clean validated data for downstream tasks
             os.makedirs(os.path.dirname(self.data_validation_config.valid_train_file_path), exist_ok=True)
-            train_dataframe.to_csv(self.data_validation_config.valid_train_file_path, index=True, header=True)
-            test_dataframe.to_csv(self.data_validation_config.valid_test_file_path, index=True, header=True)
+            train_df.to_csv(self.data_validation_config.valid_train_file_path, index=False, header=True)
+            test_df.to_csv(self.data_validation_config.valid_test_file_path, index=False, header=True)
 
-            # Create and return validation artifact
+            # Return artifact containing info about validation results
             return DataValidationArtifact(
                 validation_status=validation_status,
                 valid_train_file_path=self.data_validation_config.valid_train_file_path,

@@ -201,3 +201,43 @@ class DataTransformationConfig:
             training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR,
             training_pipeline.PREPROCESSING_OBJECT_FILE_NAME
         )
+
+# ========================================================================================
+# DataModelTrainerConfig: Configuration class for Model Training, train, and test data
+# ========================================================================================
+class ModelTrainerConfig:
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        """
+        Configuration class for the Model Trainer component.
+        Initializes paths and thresholds used during model training.
+
+        Args:
+            training_pipeline_config (TrainingPipelineConfig): 
+                Contains global pipeline configurations, including base artifact directory.
+
+        Attributes:
+            model_trainer_dir (str): Directory path where model trainer artifacts (like trained model files) will be saved.
+            trained_model_file_path (str): Full file path for saving the trained model file (e.g., 'model.pkl').
+            expected_accuracy (float): Minimum acceptable accuracy threshold to consider a trained model as successful.
+            overfitting_underfitting_threshold (float): Threshold value for acceptable difference 
+                between training and testing accuracy to detect overfitting or underfitting.
+        """
+
+        # Construct directory for storing model trainer artifacts inside the overall artifact directory
+        self.model_trainer_dir: str = os.path.join(
+            training_pipeline_config.artifact_dir,
+            training_pipeline.MODEL_TRAINER_DIR_NAME
+        )
+
+        # Path for saving the final trained model file (including folder and filename)
+        self.trained_model_file_path: str = os.path.join(
+            self.model_trainer_dir,
+            training_pipeline.MODEL_TRAINER_TRAINED_MODEL_DIR,
+            training_pipeline.MODEL_FILE_NAME
+        )
+
+        # Accuracy threshold that a model must exceed to be considered acceptable
+        self.expected_accuracy: float = training_pipeline.MODEL_TRAINER_EXPECTED_SCORE
+
+        # Allowed gap between train and test accuracy to avoid overfitting/underfitting flags
+        self.overfitting_underfitting_threshold = training_pipeline.MODEL_TRAINER_OVER_FITTING_UNDER_FITTING_THRESHOLD

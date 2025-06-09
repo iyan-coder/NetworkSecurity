@@ -35,6 +35,12 @@ TARGET_COLUMN: str = "Result"
 # Path to the schema definition file for validating structure of input data
 SCHEMA_FILE_PATH: str = os.path.join("data_schema", "schema.yaml")
 
+SAVED_MODEL_DIR = os.path.join("saved_model")
+
+MODEL_FILE_NAME = "model.pkl"
+
+MODEL_CONFIG_FILE_NAME = os.path.join("config_dir", "model_config.yaml")
+
 
 # ============================================
 # Data Ingestion Related Constants
@@ -106,4 +112,25 @@ DATA_TRANSFORMATION_IMPUTER_PARAMS: dict = {
 }
 
 # File name to save the fitted preprocessing object (e.g., scaler, encoder, imputer)
-PREPROCESSING_OBJECT_FILE_NAME = "preprocessing.pkl"
+PREPROCESSING_OBJECT_FILE_NAME: str = "preprocessing.pkl"
+
+# ===============================
+# Model Trainer Related Contants
+# ===============================
+
+# Directory name where all model trainer related files and artifacts will be stored
+MODEL_TRAINER_DIR_NAME: str = "model_trainer"
+
+# Subdirectory within the model trainer directory specifically for storing trained model files
+MODEL_TRAINER_TRAINED_MODEL_DIR: str = "trained_model"
+
+# Filename for the serialized trained model file (e.g., pickle format)
+MODEL_TRAINER_TRAINED_MODEL_NAME: str = "model.pkl"
+
+# Minimum acceptable accuracy score threshold for a model to be considered good enough
+# Models with accuracy below this will be rejected or retrained
+MODEL_TRAINER_EXPECTED_SCORE: float = 0.6
+
+# Threshold for detecting overfitting or underfitting by comparing train-test accuracy difference
+# If the difference exceeds this value, it may indicate overfitting or underfitting
+MODEL_TRAINER_OVER_FITTING_UNDER_FITTING_THRESHOLD: float = 0.05

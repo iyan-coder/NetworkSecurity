@@ -47,8 +47,10 @@ class DataValidationArtifact:
     drift_report_file_path: str           # ✅ Path to YAML file storing the drift detection report
 
 
-from dataclasses import dataclass
 
+# ===========================================================================
+# DataTransformationArtifact: Holds output of the data transformation process
+# ===========================================================================
 @dataclass
 class DataTransformationArtifact:
 
@@ -70,3 +72,36 @@ class DataTransformationArtifact:
 
     # File path to the transformed testing dataset (after preprocessing)
     transformed_test_file_path: str
+
+# ===================================================================================
+# ClassficationMetricArtifact: Data class to store key classification evaluation metrics
+# ===================================================================================
+@dataclass
+class ClassficationMetricArtifact:
+    # F1 score balances precision and recall - useful for imbalanced classification
+    f1_score: float
+    
+    # Precision indicates how many predicted positives are actually positive
+    precision_score: float
+    
+    # Recall indicates how many actual positives were correctly identified
+    recall_score: float
+
+    accuracy_score: float
+    
+    roc_auc_score: float
+
+
+# =========================================================================
+# ModelTrainerArtifact: Data class to encapsulate the outcome of model training
+# =========================================================================
+@dataclass
+class ModelTrainerArtifact:
+    # File path where the trained model (pickle or similar) is saved for later use
+    trained_model_file_path: str
+    
+    # Classification metrics evaluated on the training dataset to check model fit
+    train_metric_artifact: ClassficationMetricArtifact
+    
+    # Classification metrics evaluated on the test dataset to check generalization
+    test_metric_artifact: ClassficationMetricArtifact
