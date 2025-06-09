@@ -14,10 +14,12 @@ Date: YYYY-MM-DD
 """
 
 import sys
+import numpy as np
 from networksecurity.components.model_trainer import ModelTrainer
 from networksecurity.components.data_ingestion import DataIngestion
 from networksecurity.components.data_validation import DataValidation
 from networksecurity.components.data_transformation import DataTransformation
+from networksecurity.components.model_evaluator import ModelEvaluator
 from networksecurity.entity.config_entity import (
     DataIngestionConfig,
     DataValidationConfig,
@@ -75,6 +77,31 @@ if __name__ == "__main__":
         logger.info("Model Trainer completed.")
         print(model_trainer_artifact)
 
+        # ======================
+        # Step 6: Model evaluator
+        # ======================
+
+
+        logger.info("Starting Model evaluator...")
+
+        # Load transformed data arrays
+        train_arr = np.load(data_transformation_artifact.transformed_train_file_path)
+        test_arr = np.load(data_transformation_artifact.transformed_test_file_path)
+
+        X_train, y_train = train_arr[:, :-1], train_arr[:, -1]
+        X_test, y_test = test_arr[:, :-1], test_arr[:, -1]
+
+        # Initialize evaluator and run evaluation
+        model_evaluator = ModelEvaluator(data_transformation_artifact,
+                                         model_path="Artifacts/06_09_2025_15_46_32/model_trainer/trained_model/model.pkl",  # or wherever your trained model is saved
+                                         mode="load_and_evaluate"
+                    )
+        best_model, train_metric, test_metric = model_evaluator.evaluate(X_train, y_train, X_test, y_test)
+
+        logger.info("Model evaluator completed.")
+        print("Best model evaluation completed.")
+        print("Train Accuracy:", train_metric.accuracy_score)
+        print("Test Accuracy:", test_metric.accuracy_score)
 
 
     except Exception as e:

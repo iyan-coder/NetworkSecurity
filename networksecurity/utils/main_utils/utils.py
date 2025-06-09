@@ -2,7 +2,8 @@ import yaml
 from networksecurity.exception.exception import NetworkSecurityException
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
-from typing import Any, Dict
+from sklearn.base import BaseEstimator
+from typing import Any, Dict,Tuple
 from networksecurity.logger.logger import logger
 import os
 import sys
@@ -189,83 +190,78 @@ def load_numpy_array_data(file_path: str) -> np.ndarray:
     except Exception as e:
         logger.error(f"Failed to load numpy array from file: {file_path}", exc_info=True)
         raise NetworkSecurityException(e, sys)
+    
 
-
-# ===============
-# EVALUATE MODELS
-# ===============
 
 def evaluate_models(
     X_train: np.ndarray,
     y_train: np.ndarray,
     X_test: np.ndarray,
     y_test: np.ndarray,
-    models: Dict[str, Any],
-    param: Dict[str, Dict[str, Any]]
-) -> Dict[str, Dict[str, Any]]:
+    models: Dict[str, BaseEstimator],
+    param: Dict[str, Dict[str, Any]],
+    skip_training: bool = False
+) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, BaseEstimator]]:
     """
-    Perform hyperparameter tuning using GridSearchCV on each model, train with best parameters,
-    evaluate on test set, and return a report containing best params and accuracy.
+    Evaluate multiple models, optionally perform hyperparameter tuning.
 
     Args:
         X_train (np.ndarray): Training features.
         y_train (np.ndarray): Training labels.
-        X_test (np.ndarray): Testing features.
-        y_test (np.ndarray): Testing labels.
-        models (Dict[str, Any]): Dictionary of model name to model instance.
-        param (Dict[str, Dict[str, Any]]): Dictionary of model name to hyperparameter grid.
+        X_test (np.ndarray): Test features.
+        y_test (np.ndarray): Test labels.
+        models (Dict[str, BaseEstimator]): Dictionary of model names to estimator instances.
+        param (Dict[str, Dict[str, Any]]): Dictionary of hyperparameters for each model.
+        skip_training (bool): If True, assumes models are already trained.
 
     Returns:
-        Dict[str, Dict[str, Any]]: A report dictionary containing for each model:
-            - best_params: Best hyperparameters found.
-            - accuracy: Accuracy score on test data.
-            - comparison: List of dictionaries with true and predicted labels for inspection.
-
-    Raises:
-        NetworkSecurityException: If model evaluation fails.
+        Tuple[Dict[str, Dict[str, Any]], Dict[str, BaseEstimator]]:
+            - model_report: metrics like accuracy and best params for each model.
+            - trained_models: the trained (or reused) estimators.
     """
-    try:
-        report: Dict[str, Dict[str, Any]] = {}
-        logger.info("Starting model evaluation and hyperparameter tuning...")
+    report: Dict[str, Dict[str, Any]] = {}
+    trained_models: Dict[str, BaseEstimator] = {}
 
-        # Iterate over each model and its parameter grid
+    try:
+        logger.info("Starting model evaluation...")
         for model_name, model in models.items():
             logger.info(f"Evaluating model: {model_name}")
 
-            para = param.get(model_name, {})
-            logger.debug(f"Hyperparameter grid for {model_name}: {para}")
+            if skip_training:
+                logger.info(f"Skipping training for model: {model_name}. Using pre-trained model.")
+                y_test_pred = model.predict(X_test)
+                accuracy = accuracy_score(y_test, y_test_pred)
 
-            # Setup GridSearchCV for hyperparameter tuning with 3-fold cross-validation
-            gs = GridSearchCV(model, para, cv=3)
+                logger.info(f"Accuracy for {model_name}: {accuracy:.4f}")
+                report[model_name] = {
+                    "accuracy": accuracy,
+                    "best_params": "Skipped"
+                }
+                trained_models[model_name] = model
 
-            # Fit grid search on training data to find best hyperparameters
-            gs.fit(X_train, y_train)
-            logger.info(f"Best parameters for {model_name}: {gs.best_params_}")
+            else:
+                logger.info(f"Starting hyperparameter tuning for model: {model_name}")
+                gs = GridSearchCV(model, param[model_name], cv=3, n_jobs=-1)
+                gs.fit(X_train, y_train)
+                logger.info(f"Best parameters for {model_name}: {gs.best_params_}")
 
-            # Update model with best parameters and retrain on full training data
-            model.set_params(**gs.best_params_)
-            model.fit(X_train, y_train)
+                best_model = gs.best_estimator_
+                best_model.fit(X_train, y_train)
+                logger.info(f"Model {model_name} trained successfully.")
 
-            # Predict on test data using the tuned model
-            y_test_pred = model.predict(X_test)
+                y_test_pred = best_model.predict(X_test)
+                accuracy = accuracy_score(y_test, y_test_pred)
+                logger.info(f"Accuracy for {model_name}: {accuracy:.4f}")
 
-            # Calculate accuracy score for test predictions
-            accuracy = accuracy_score(y_test, y_test_pred)
-            logger.info(f"Accuracy for model {model_name}: {accuracy:.4f}")
+                report[model_name] = {
+                    "accuracy": accuracy,
+                    "best_params": gs.best_params_
+                }
+                trained_models[model_name] = best_model
 
-           
-
-            # Store evaluation results for current model in the report
-            report[model_name] = {
-                "best_params": gs.best_params_,
-                "accuracy": accuracy,
-                
-            }
-
-        logger.info("Completed model evaluation for all candidates.")
-        # Return complete evaluation report of all models
-        return report
+        logger.info("All models evaluated successfully.")
+        return report, trained_models
 
     except Exception as e:
-        logger.error("Failed to evaluate models", exc_info=True)
+        logger.error("Model evaluation failed", exc_info=True)
         raise NetworkSecurityException(e, sys)
