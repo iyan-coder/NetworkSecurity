@@ -3,7 +3,6 @@
 # Artifacts are structured outputs from each stage in the ML pipeline.
 # They help track outputs and pass necessary data/configs downstream.
 # -------------------------------------------------------------
-
 from dataclasses import dataclass  # Provides a decorator and functions for automatically adding special methods
 
 
@@ -55,15 +54,17 @@ class DataValidationArtifact:
 class DataTransformationArtifact:
 
     """
-    Data class for storing artifact paths generated during the data transformation step
-    of a machine learning pipeline.
+Data class for storing artifact paths generated during the data transformation step
+of a machine learning pipeline.
 
-    Attributes:
-        transformed_object_file_path (str): Path to the serialized preprocessing object
-                                            (e.g., imputer, scaler, encoder).
-        transformed_train_file_path (str): Path to the preprocessed and transformed training dataset.
-        transformed_test_file_path (str): Path to the preprocessed and transformed testing dataset.
-    """
+Attributes:
+    transformed_object_file_path (str): Path to the serialized preprocessing object
+                                        (e.g., imputer, scaler, encoder).
+    transformed_train_file_path (str): Path to the preprocessed and transformed training dataset.
+    transformed_test_file_path (str): Path to the preprocessed and transformed testing dataset.
+    feature_columns_file_path (str): Path to the saved list of feature column names (as .pkl).
+"""
+
     # File path to the serialized preprocessing object (e.g., imputer, scaler, encoder)
     transformed_object_file_path: str
 
@@ -72,6 +73,9 @@ class DataTransformationArtifact:
 
     # File path to the transformed testing dataset (after preprocessing)
     transformed_test_file_path: str
+
+    feature_columns_file_path: str
+
 
 # ===================================================================================
 # ClassficationMetricArtifact: Data class to store key classification evaluation metrics

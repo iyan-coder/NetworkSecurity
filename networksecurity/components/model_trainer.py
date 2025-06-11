@@ -1,54 +1,77 @@
-import os, sys
-from networksecurity.logger.logger import logger
+# Import necessary Python libraries
+import os  # To create folders and handle file paths
+import sys  # For system-specific exception handling
+import pandas as pd  # Used to work with tabular data (DataFrames)
+
+# Project-specific imports
+from networksecurity.logger.logger import logger  # For logging messages
 from networksecurity.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact
 from networksecurity.entity.config_entity import ModelTrainerConfig
-from networksecurity.utils.ml_utils.model.estimator import NetworkModel
-from networksecurity.utils.main_utils.utils import save_object, load_object, load_numpy_array_data
-from networksecurity.components.model_evaluator import ModelEvaluator
-from networksecurity.exception.exception import NetworkSecurityException
+from networksecurity.utils.ml_utils.model.estimator import NetworkModel  # Custom model wrapper
+from networksecurity.utils.main_utils.utils import save_object, load_object  # To save/load Python objects
+from networksecurity.components.model_evaluator import ModelEvaluator  # Evaluates different models
+from networksecurity.exception.exception import NetworkSecurityException  # Custom exception
+from networksecurity.constant.training_pipeline import TARGET_COLUMN  # The name of the column we're predicting
 
+
+# ModelTrainer handles training and saving the best ML model
 class ModelTrainer:
     """
-    ModelTrainer is responsible for:
-    - Loading the transformed training and testing data.
-    - Using ModelEvaluator to find the best model based on metrics.
-    - Saving the best model wrapped with the preprocessor.
-    - Returning a ModelTrainerArtifact with file path and evaluation metrics.
+    This class:
+    - Loads the transformed train/test data.
+    - Trains models and finds the best one using ModelEvaluator.
+    - Saves the best model wrapped with the preprocessor.
+    - Returns an artifact with the model path and performance scores.
     """
 
     def __init__(self, model_trainer_config: ModelTrainerConfig,
                  data_transformation_artifact: DataTransformationArtifact):
         """
-        Constructor for ModelTrainer.
+        Constructor sets up necessary configs and paths.
 
         Args:
-            model_trainer_config (ModelTrainerConfig): Config containing path to save the model.
-            data_transformation_artifact (DataTransformationArtifact): Contains paths to transformed data.
+            model_trainer_config: Where to save the trained model.
+            data_transformation_artifact: Where to get transformed train/test data and preprocessor.
         """
         logger.info("Initializing ModelTrainer...")
         self.model_trainer_config = model_trainer_config
         self.data_transformation_artifact = data_transformation_artifact
 
+    @staticmethod
+    def read_data(file_path: str) -> pd.DataFrame:
+        """
+        Reads CSV file from disk and returns it as a pandas DataFrame.
+        """
+        try:
+            return pd.read_csv(file_path)
+        except Exception as e:
+            logger.error("Failed to read file", exc_info=True)
+            raise NetworkSecurityException(e, sys)
+
     def _save_model(self, model, preprocessor):
         """
-        Internal method to save the trained model along with its preprocessor.
+        Saves the trained model together with the preprocessor into a file.
 
         Args:
-            model: The trained ML model.
-            preprocessor: The preprocessor (e.g., StandardScaler, ColumnTransformer) used in training.
+            model: Best trained model.
+            preprocessor: The preprocessor used during data transformation.
         """
         try:
             logger.info("Saving the trained model with preprocessor...")
 
-            # Ensure model directory exists
+            # Create the directory for saving the model if it doesn't exist
             model_dir = os.path.dirname(self.model_trainer_config.trained_model_file_path)
             os.makedirs(model_dir, exist_ok=True)
 
-            # Wrap the model with its preprocessor
-            network_model = NetworkModel(preprocessor=preprocessor, model=model)
+            # Load the list of feature columns to make sure everything stays aligned
+            feature_columns = load_object(self.data_transformation_artifact.feature_columns_file_path)
 
-            # Save the wrapped model object
+            # Wrap model with its preprocessor and column names
+            network_model = NetworkModel(preprocessor=preprocessor, model=model, feature_columns=feature_columns)
+
+            # Save the wrapped model to disk
             save_object(self.model_trainer_config.trained_model_file_path, obj=network_model)
+
             logger.info(f"Model saved successfully at: {self.model_trainer_config.trained_model_file_path}")
 
         except Exception as e:
@@ -57,44 +80,50 @@ class ModelTrainer:
 
     def initiate_model_trainer(self) -> ModelTrainerArtifact:
         """
-        Main function to:
-        - Load transformed data.
-        - Train and evaluate multiple models using ModelEvaluator.
-        - Save the best performing model.
-        - Return training artifacts.
-
-        Returns:
-            ModelTrainerArtifact: Contains model path and performance metrics.
+        Runs the full training process:
+        - Loads transformed data
+        - Splits into features and labels
+        - Trains and evaluates models
+        - Saves best model
+        - Returns an artifact with results
         """
         try:
             logger.info("Loading transformed train and test data...")
 
-            # Load transformed train and test data from disk (saved as .npy arrays)
-            train_arr = load_numpy_array_data(self.data_transformation_artifact.transformed_train_file_path)
-            test_arr = load_numpy_array_data(self.data_transformation_artifact.transformed_test_file_path)
+            # Load the CSV files containing transformed data
+            train_df = self.read_data(self.data_transformation_artifact.transformed_train_file_path)
+            test_df = self.read_data(self.data_transformation_artifact.transformed_test_file_path)
 
-            # Separate features (X) and labels (y)
-            X_train, y_train = train_arr[:, :-1], train_arr[:, -1]
-            X_test, y_test = test_arr[:, :-1], test_arr[:, -1]
+            # Load feature column names (needed to separate features from labels)
+            feature_columns = load_object(self.data_transformation_artifact.feature_columns_file_path)
+
+            # Split the training data into X (features) and y (target)
+            X_train = train_df[feature_columns]
+            y_train = train_df[TARGET_COLUMN]
+
+            # Split the test data the same way
+            X_test = test_df[feature_columns]
+            y_test = test_df[TARGET_COLUMN]
+
             logger.info("Successfully split features and labels from transformed arrays.")
 
-            # Initialize the evaluator to find the best model
+            # Use ModelEvaluator to find the best-performing model
+
             logger.info("Evaluating models to find the best one...")
             evaluator = ModelEvaluator(self.data_transformation_artifact)
             best_model, train_metric, test_metric = evaluator.evaluate(X_train, y_train, X_test, y_test)
 
-            # Load the preprocessor (used during data transformation)
+            # Load the preprocessor used during data transformation
             logger.info("Loading data preprocessor used during transformation...")
             preprocessor = load_object(self.data_transformation_artifact.transformed_object_file_path)
 
-            # Save the best model (wrapped with preprocessor)
+            # Save the model and preprocessor wrapped together
             logger.info("Saving the final trained model...")
             self._save_model(best_model, preprocessor)
 
-            # Log final training completion
             logger.info("Model training completed successfully.")
 
-            # Return the artifact with model path and performance metrics
+            # Return model training results
             return ModelTrainerArtifact(
                 trained_model_file_path=self.model_trainer_config.trained_model_file_path,
                 train_metric_artifact=train_metric,

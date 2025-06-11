@@ -167,12 +167,6 @@ class DataTransformationConfig:
     """
     Configuration class for managing file paths and directory structure related to 
     the data transformation phase of the ML pipeline.
-
-    Attributes:
-        data_transformation_dir (str): Base directory for all data transformation artifacts.
-        transformed_train_file_path (str): Path to the transformed training dataset (.npy format).
-        transformed_test_file_path (str): Path to the transformed testing dataset (.npy format).
-        transformed_object_file_path (str): Path to the serialized preprocessing object (e.g., imputer, scaler).
     """
     def __init__(self, training_pipeline_config: TrainingPipelineConfig):
         # Directory where all transformation artifacts will be stored
@@ -185,14 +179,14 @@ class DataTransformationConfig:
         self.transformed_train_file_path: str = os.path.join(
             self.data_transformation_dir,
             training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR,
-            training_pipeline.TRAIN_FILE_NAME.replace("csv", "npy")
+            training_pipeline.TRAIN_FILE_NAME
         )
 
         # Path for the transformed testing data file (converted from .csv to .npy)
         self.transformed_test_file_path: str = os.path.join(
             self.data_transformation_dir,
             training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR,
-            training_pipeline.TEST_FILE_NAME.replace("csv", "npy")
+            training_pipeline.TEST_FILE_NAME
         )
 
         # Path to save the preprocessing object used for transforming the data
@@ -201,6 +195,14 @@ class DataTransformationConfig:
             training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR,
             training_pipeline.PREPROCESSING_OBJECT_FILE_NAME
         )
+
+        # ✅ Path to save the list of feature column names (for use in inference/evaluation)
+        self.feature_columns_file_path: str = os.path.join(
+            self.data_transformation_dir,
+            training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR,
+            training_pipeline.FEATURE_NAME
+        )
+
 
 # ========================================================================================
 # DataModelTrainerConfig: Configuration class for Model Training, train, and test data

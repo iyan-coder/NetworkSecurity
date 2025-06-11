@@ -5,6 +5,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.base import BaseEstimator
 from typing import Any, Dict,Tuple
 from networksecurity.logger.logger import logger
+from datetime import datetime
 import os
 import sys
 import numpy as np
@@ -194,25 +195,16 @@ def load_numpy_array_data(file_path: str) -> np.ndarray:
 
 
 def evaluate_models(
-    X_train: np.ndarray,
-    y_train: np.ndarray,
-    X_test: np.ndarray,
-    y_test: np.ndarray,
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    X_test: pd.DataFrame,
+    y_test: pd.Series,
     models: Dict[str, BaseEstimator],
     param: Dict[str, Dict[str, Any]],
     skip_training: bool = False
 ) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, BaseEstimator]]:
     """
     Evaluate multiple models, optionally perform hyperparameter tuning.
-
-    Args:
-        X_train (np.ndarray): Training features.
-        y_train (np.ndarray): Training labels.
-        X_test (np.ndarray): Test features.
-        y_test (np.ndarray): Test labels.
-        models (Dict[str, BaseEstimator]): Dictionary of model names to estimator instances.
-        param (Dict[str, Dict[str, Any]]): Dictionary of hyperparameters for each model.
-        skip_training (bool): If True, assumes models are already trained.
 
     Returns:
         Tuple[Dict[str, Dict[str, Any]], Dict[str, BaseEstimator]]:
@@ -223,45 +215,76 @@ def evaluate_models(
     trained_models: Dict[str, BaseEstimator] = {}
 
     try:
-        logger.info("Starting model evaluation...")
+        logger.info(" Starting model evaluation...")
+        print("Starting model evaluation...")
+
+        # Debug: Show input shapes and model info
+        # Debug: Log input shapes and model/meta information
+        logger.info(f"X_train.shape: {X_train.shape}")
+        logger.info(f"y_train.shape: {y_train.shape}")
+        logger.info(f"X_test.shape: {X_test.shape}")
+        logger.info(f"y_test.shape: {y_test.shape}")
+        logger.info(f"Models received: {list(models.keys())}")
+        logger.info(f"Params received: {list(param.keys())}")
+
+
         for model_name, model in models.items():
-            logger.info(f"Evaluating model: {model_name}")
+            logger.info(f" Evaluating model: {model_name}")
 
             if skip_training:
-                logger.info(f"Skipping training for model: {model_name}. Using pre-trained model.")
+                logger.info(f"Skipping training for: {model_name}")
                 y_test_pred = model.predict(X_test)
                 accuracy = accuracy_score(y_test, y_test_pred)
 
-                logger.info(f"Accuracy for {model_name}: {accuracy:.4f}")
                 report[model_name] = {
                     "accuracy": accuracy,
                     "best_params": "Skipped"
                 }
                 trained_models[model_name] = model
+                logger.info(f"Accuracy for {model_name}: {accuracy:.4f}")
 
             else:
-                logger.info(f"Starting hyperparameter tuning for model: {model_name}")
+                # Safety: Ensure parameter grid exists
+                if model_name not in param:
+                    raise NetworkSecurityException(
+                        f"Missing parameter grid for model: '{model_name}'", sys
+                    )
+
+                logger.info(f" Running GridSearchCV for: {model_name}")
                 gs = GridSearchCV(model, param[model_name], cv=3, n_jobs=-1)
                 gs.fit(X_train, y_train)
-                logger.info(f"Best parameters for {model_name}: {gs.best_params_}")
 
                 best_model = gs.best_estimator_
                 best_model.fit(X_train, y_train)
-                logger.info(f"Model {model_name} trained successfully.")
 
                 y_test_pred = best_model.predict(X_test)
                 accuracy = accuracy_score(y_test, y_test_pred)
-                logger.info(f"Accuracy for {model_name}: {accuracy:.4f}")
 
                 report[model_name] = {
                     "accuracy": accuracy,
                     "best_params": gs.best_params_
                 }
                 trained_models[model_name] = best_model
+                logger.info(f"Best accuracy for {model_name}: {accuracy:.4f}")
 
         logger.info("All models evaluated successfully.")
         return report, trained_models
 
     except Exception as e:
-        logger.error("Model evaluation failed", exc_info=True)
+        logger.error("Model evaluation failed.", exc_info=True)
+        print("Exception in evaluate_models():", e)
         raise NetworkSecurityException(e, sys)
+        
+def get_latest_artifact_dir(base_dir="Artifacts"):
+    # Get all directories under base_dir
+    dirs = [
+        d for d in os.listdir(base_dir)
+        if os.path.isdir(os.path.join(base_dir, d))
+    ]
+
+    # Convert to datetime for sorting
+    dirs = sorted(dirs, key=lambda x: datetime.strptime(x, "%m_%d_%Y_%H_%M_%S"), reverse=True)
+
+    latest_dir = dirs[0]
+    return os.path.join(base_dir, latest_dir)
+

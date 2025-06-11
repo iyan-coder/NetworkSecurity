@@ -3,6 +3,7 @@ import os
 import sys
 from networksecurity.exception.exception import NetworkSecurityException
 from networksecurity.logger.logger import logger
+import pandas as pd
 
 class NetworkModel:
     """
@@ -16,7 +17,7 @@ class NetworkModel:
     preventing data mismatch errors and improving reliability.
     """
 
-    def __init__(self, preprocessor, model):
+    def __init__(self, preprocessor, model, feature_columns):
         """
         Initialize the NetworkModel with a preprocessor and trained model.
 
@@ -30,31 +31,25 @@ class NetworkModel:
         try:
             self.preprocessor = preprocessor
             self.model = model
+            self.feature_columns = feature_columns  
         except Exception as e:
             logger.error("Failed to initiate NetworkModel")
             raise NetworkSecurityException(e, sys)
         
     def predict(self, x):
         """
-        Perform prediction on raw input data by first applying preprocessing,
-        then using the trained model to generate predictions.
-
-        Args:
-            x: Raw input data (e.g., numpy array or DataFrame)
-
-        Returns:
-            y_hat: Model predictions corresponding to input x
-        
-        Raises:
-            NetworkSecurityException: If prediction fails due to any error
+        Transforms input and returns model predictions.
         """
         try:
-            # Apply the preprocessing pipeline to transform raw input features
-            x_transform = self.preprocessor.transform(x)
+            # Ensure input is a DataFrame with the correct feature names
+            if not isinstance(x, pd.DataFrame):
+                x = pd.DataFrame(x, columns=self.feature_columns)
 
-            # Predict labels or values using the trained model on transformed data
+            # Transform and predict
+            x_transform = self.preprocessor.transform(x)
             y_hat = self.model.predict(x_transform)
             return y_hat
+
         except Exception as e:
             logger.error("Error! Prediction failed")
             raise NetworkSecurityException(e, sys)

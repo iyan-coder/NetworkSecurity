@@ -41,6 +41,9 @@ MODEL_FILE_NAME = "model.pkl"
 
 MODEL_CONFIG_FILE_NAME = os.path.join("config_dir", "model_config.yaml")
 
+# Feature Name
+FEATURE_NAME: str = "feature_columns.pkl"
+
 
 # ============================================
 # Data Ingestion Related Constants
@@ -97,6 +100,8 @@ DATA_TRANSFORMATION_TRANSFORMATED_DATA_DIR: str = "transformed"
 
 # Subdirectory to store serialized transformation objects like scalers or imputers
 DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR: str = "transformed_object"
+
+
 
 # =====================================
 # KNN imputer parameters for missing values
