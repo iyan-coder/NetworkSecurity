@@ -2,7 +2,7 @@
 import os  # To create folders and handle file paths
 import sys  # For system-specific exception handling
 import pandas as pd  # Used to work with tabular data (DataFrames)
-
+import mlflow
 # Project-specific imports
 from networksecurity.logger.logger import logger  # For logging messages
 from networksecurity.entity.artifact_entity import DataTransformationArtifact, ModelTrainerArtifact
@@ -12,6 +12,8 @@ from networksecurity.utils.main_utils.utils import save_object, load_object  # T
 from networksecurity.components.model_evaluator import ModelEvaluator  # Evaluates different models
 from networksecurity.exception.exception import NetworkSecurityException  # Custom exception
 from networksecurity.constant.training_pipeline import TARGET_COLUMN  # The name of the column we're predicting
+import dagshub
+dagshub.init(repo_owner='iyan-coder', repo_name='networksecurity', mlflow=True)
 
 
 # ModelTrainer handles training and saving the best ML model
@@ -89,6 +91,11 @@ class ModelTrainer:
         """
         try:
             logger.info("Loading transformed train and test data...")
+            with mlflow.start_run(run_name="Model_Training_Pipeline"):
+
+                # Log basic params
+                mlflow.log_param("pipeline_step", "ModelTrainer")
+                mlflow.log_param("model_storage_path", self.model_trainer_config.trained_model_file_path)
 
             # Load the CSV files containing transformed data
             train_df = self.read_data(self.data_transformation_artifact.transformed_train_file_path)
@@ -120,6 +127,14 @@ class ModelTrainer:
             # Save the model and preprocessor wrapped together
             logger.info("Saving the final trained model...")
             self._save_model(best_model, preprocessor)
+            
+
+            mlflow.log_metrics({
+                                "final_train_accuracy": train_metric.accuracy_score,
+                                "final_test_accuracy": test_metric.accuracy_score,
+                                "final_train_f1": train_metric.f1_score,
+                                "final_test_f1": test_metric.f1_score
+                            })
 
             logger.info("Model training completed successfully.")
 

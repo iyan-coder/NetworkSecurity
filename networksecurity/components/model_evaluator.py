@@ -16,6 +16,9 @@ from networksecurity.constant.training_pipeline import MODEL_CONFIG_FILE_NAME  #
 # Used to get info about model inputs/outputs for MLflow logging
 from mlflow.models.signature import infer_signature  
 import joblib  # Used to load or save trained models
+import dagshub
+dagshub.init(repo_owner='iyan-coder', repo_name='networksecurity', mlflow=True)
+
 class ModelEvaluator:
     """
     This class is in charge of:
@@ -153,7 +156,6 @@ class ModelEvaluator:
                 # If anything goes wrong, log the error and raise a custom exception
                 logger.error("Error during model evaluation", exc_info=True)
                 raise NetworkSecurityException(e, sys)
-
 
 
 

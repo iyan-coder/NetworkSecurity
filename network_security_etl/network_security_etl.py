@@ -3,18 +3,6 @@ import os
 import sys
 import json
 
-# Load environment variables (e.g., DB connection strings) securely
-from dotenv import load_dotenv
-load_dotenv()
-
-# Get MongoDB connection string from .env file
-MONGO_DB_URL = os.getenv("MONGO_DB_URL")
-print(MONGO_DB_URL)  # ⚠️ Remove or log securely in production
-
-# For validating SSL certificates during MongoDB connection
-import certifi
-ca = certifi.where()
-
 # Data handling libraries
 import pandas as pd
 import numpy as np
@@ -23,6 +11,18 @@ import pymongo
 # Custom exception and logging modules (defined in your project)
 from networksecurity.exception.exception import NetworkSecurityException
 from networksecurity.logger.logger import logger
+
+# Load environment variables (e.g., DB connection strings) securely
+from dotenv import load_dotenv
+load_dotenv()
+
+# Get MongoDB connection string from .env file
+MONGO_DB_URL = os.getenv("MONGO_DB_URL")
+print(MONGO_DB_URL)  #Remove or log securely in production
+
+# For validating SSL certificates during MongoDB connection
+import certifi
+ca = certifi.where()
 
 # === Core Class for Data Extraction and MongoDB Insertion ===
 class NetworkDataExtract:

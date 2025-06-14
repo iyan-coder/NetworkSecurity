@@ -115,6 +115,9 @@ class DataTransformation:
             # Step 8: Save the preprocessor so we can use it later on new data
             save_object(self.data_transformation_config.transformed_object_file_path, preprocessor)
 
+            #Preprocessor pusher
+            save_object("final_model/preprocessor.pkl", preprocessor)
+
             logger.info("Data transformation completed successfully.")
 
             # Step 9: Return an object that tells where everything is saved

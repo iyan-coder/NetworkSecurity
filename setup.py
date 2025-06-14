@@ -32,7 +32,7 @@ def get_requirements() -> List[str]:
                     requirement_list.append(requirement)
 
     except FileNotFoundError:
-        print("❌ requirements.txt file not found. Skipping install_requires.")
+        print("requirements.txt file not found. Skipping install_requires.")
 
     return requirement_list
 

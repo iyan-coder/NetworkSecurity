@@ -35,11 +35,11 @@ class TrainingPipelineConfig:
         # Base name for artifact storage (e.g., "artifact")
         self.artifact_name = training_pipeline.ARTIFACT_DIR
 
-        # Complete path for artifact directory including timestamp
-        self.artifact_dir = os.path.join(self.artifact_name, timestamp)
-
         # Store formatted timestamp for downstream usage
         self.timestamp: str = timestamp
+
+        # Complete path for artifact directory including timestamp
+        self.artifact_dir = os.path.join(self.artifact_name, timestamp)
 
 
 # =========================================================
@@ -196,7 +196,7 @@ class DataTransformationConfig:
             training_pipeline.PREPROCESSING_OBJECT_FILE_NAME
         )
 
-        # ✅ Path to save the list of feature column names (for use in inference/evaluation)
+        # Path to save the list of feature column names (for use in inference/evaluation)
         self.feature_columns_file_path: str = os.path.join(
             self.data_transformation_dir,
             training_pipeline.DATA_TRANSFORMATION_TRANSFORMATED_OBJECT_DIR,
