@@ -139,3 +139,5 @@ MODEL_TRAINER_EXPECTED_SCORE: float = 0.6
 # Threshold for detecting overfitting or underfitting by comparing train-test accuracy difference
 # If the difference exceeds this value, it may indicate overfitting or underfitting
 MODEL_TRAINER_OVER_FITTING_UNDER_FITTING_THRESHOLD: float = 0.05
+
+TRAINING_BUCKET_NAME = "networksecuirty"

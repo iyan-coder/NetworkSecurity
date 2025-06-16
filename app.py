@@ -12,7 +12,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile,Request
 from uvicorn import run as app_run
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 import pandas as pd
 
@@ -62,7 +62,7 @@ async def train_route():
     try:
         training_pipeline = TrainingPipeline()
         training_pipeline.run_training_pipeline()
-        return {"message": "Training completed successfully!"}
+        return JSONResponse(content={"message": "Training completed successfully!"})
     except Exception as e:
         logger.error("Training failed", exc_info=True)
         raise NetworkSecurityException(e, sys)
@@ -73,7 +73,7 @@ async def evaluate_route():
     try:
         evaluation_pipeline = ModelEvaluationPipeline()
         evaluation_pipeline.run_evaluation_pipeline()
-        return {"message": "Evaluation completed successfully!"}
+        return JSONResponse(content={"message": "Evaluation completed successfully!"})
     except Exception as e:
         logger.error("Evaluation failed", exc_info=True)
         raise NetworkSecurityException(e, sys)
@@ -101,11 +101,14 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
 
         # Create model object
         network_model = NetworkModel(preprocessor=preprocessor, model=final_model, feature_columns=feature_columns)
+        print(df.iloc[0])
 
         # Predict
         y_pred = network_model.predict(df)
+        print(y_pred)
         df['predicted_column'] = y_pred
-
+        print(df["predicted_column"])
+        
         # Save output CSV
         os.makedirs("prediction_output", exist_ok=True)
         output_path = os.path.join("prediction_output", f"output_{file.filename}")
@@ -121,4 +124,4 @@ async def predict_route(request: Request, file: UploadFile = File(...)):
         raise NetworkSecurityException(e, sys)
 
 if __name__ == "__main__":
-    uvicorn.run("app:app", host="localhost", port=8000, reload=True)
+    app_run("app:app", host="localhost", port=8000, reload=True)

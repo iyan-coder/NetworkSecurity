@@ -40,6 +40,7 @@ class TrainingPipelineConfig:
 
         # Complete path for artifact directory including timestamp
         self.artifact_dir = os.path.join(self.artifact_name, timestamp)
+        self.model_dir = os.path.join("final_model")
 
 
 # =========================================================
