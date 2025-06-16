@@ -41,15 +41,23 @@ class NetworkModel:
         Transforms input and returns model predictions.
         """
         try:
-            # Ensure input is a DataFrame with the correct feature names
             if not isinstance(x, pd.DataFrame):
                 x = pd.DataFrame(x, columns=self.feature_columns)
+            else:
+                x = x[self.feature_columns]
 
-            # Transform and predict
-            x_transform = self.preprocessor.transform(x)
-            y_hat = self.model.predict(x_transform)
+            # Transform input
+            x_transformed = self.preprocessor.transform(x)
+
+            #Convert back to DataFrame to match training structure
+            x_transformed_df = pd.DataFrame(x_transformed, columns=self.model.feature_names_in_)
+
+            # Predict using DataFrame input to avoid the warning
+            y_hat = self.model.predict(x_transformed_df)
+
             return y_hat
 
+        
         except Exception as e:
             logger.error("Error! Prediction failed")
             raise NetworkSecurityException(e, sys)

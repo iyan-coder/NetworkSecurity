@@ -73,6 +73,7 @@ class ModelTrainer:
 
             # Save the wrapped model to disk
             save_object(self.model_trainer_config.trained_model_file_path, obj=network_model)
+         
 
             logger.info(f"Model saved successfully at: {self.model_trainer_config.trained_model_file_path}")
 
@@ -127,15 +128,9 @@ class ModelTrainer:
             # Save the model and preprocessor wrapped together
             logger.info("Saving the final trained model...")
             self._save_model(best_model, preprocessor)
+            #model pusher
+            save_object("final_model/model.pkl",best_model)
             
-
-            mlflow.log_metrics({
-                                "final_train_accuracy": train_metric.accuracy_score,
-                                "final_test_accuracy": test_metric.accuracy_score,
-                                "final_train_f1": train_metric.f1_score,
-                                "final_test_f1": test_metric.f1_score
-                            })
-
             logger.info("Model training completed successfully.")
 
             # Return model training results

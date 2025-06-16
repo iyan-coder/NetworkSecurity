@@ -15,12 +15,24 @@ from networksecurity.components.model_evaluator import ModelEvaluator
 from networksecurity.entity.artifact_entity import DataTransformationArtifact
 
 
-# Define the model evaluation pipeline class
 class ModelEvaluationPipeline:
     def __init__(self):
-        # Initialize with training pipeline configuration
+        # Load latest artifact folder
+        latest_artifact_dir = get_latest_artifact_dir()
+
+        # Base path to data transformation
+        data_transformation_dir = os.path.join(latest_artifact_dir, "data_transformation")
+
+        # Store paths you need later in evaluation
+        self.transformed_train_file_path = os.path.join(data_transformation_dir, "transformed", "train.csv")
+        self.transformed_test_file_path = os.path.join(data_transformation_dir, "transformed", "test.csv")
+        self.feature_columns_file_path = os.path.join(data_transformation_dir, "transformed_object", "feature_columns.pkl")
+
+        # Also store model path for evaluation
+        self.model_path = os.path.join(latest_artifact_dir, "model_trainer", "trained_model", "model.pkl")
+
+        # Init training config if needed
         self.training_pipeline_config = TrainingPipelineConfig()
-        self.data_transformation_artifact = DataTransformationArtifact()
 
     # Define the main method to run the model evaluation process
     def run_evaluation_pipeline(self):
@@ -29,12 +41,11 @@ class ModelEvaluationPipeline:
             logger.info("Starting standalone model evaluation pipeline...")
 
             # Load transformed train and test datasets
-            train_df = pd.read_csv(self.data_transformation_artifact.transformed_train_file_path)
-            test_df = pd.read_csv(self.data_transformation_artifact.transformed_test_file_path)
+            train_df = pd.read_csv(self.transformed_train_file_path)
+            test_df = pd.read_csv(self.transformed_test_file_path)
 
-            # # Load feature columns (used for selecting X)
-            feature_columns = load_object(self.data_transformation_artifact.feature_columns_file_path)
-
+            # Load feature columns (used for selecting X)
+            feature_columns = load_object(self.feature_columns_file_path)
 
             # Extract features and target column from the training set
             X_train = train_df[feature_columns]
@@ -44,9 +55,8 @@ class ModelEvaluationPipeline:
             X_test = test_df[feature_columns]
             y_test = test_df[TARGET_COLUMN]
 
-            # Locate the latest trained model file
-            latest_artifact_dir = get_latest_artifact_dir()
-            model_path = os.path.join(latest_artifact_dir, "model_trainer", "trained_model", "model.pkl")
+            # Locate the latest trained model 
+            model_path = self.model_path
 
             # Initialize the model evaluator in "load and evaluate" mode
             model_evaluator = ModelEvaluator(
@@ -60,11 +70,10 @@ class ModelEvaluationPipeline:
 
             # Log the results of model evaluation
             logger.info(
-                f"Model Evaluation Completed.\nTrain Accuracy: {train_metric.accuracy_score}\nTest Accuracy: {test_metric.accuracy_score}"
-            )
-
+                f"Model Evaluation Completed.\nTrain metric: {train_metric}\nTest metric: {test_metric}"
+)
+            return best_model, train_metric, test_metric
         # Handle and log any exception that occurs during evaluation
         except Exception as e:
             logger.error("Model evaluation pipeline failed", exc_info=True)
             raise NetworkSecurityException(e, sys)
-

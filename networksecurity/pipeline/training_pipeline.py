@@ -92,7 +92,12 @@ class TrainingPipeline:
                                          model_trainer_config=self.model_trainer_config)      
 
             model_trainer_artifact = model_trainer.initiate_model_trainer()
-            logger.info(f"Model trainer completed and artifacts: {model_trainer_artifact}")
+            logger.info(f"""
+                Model Trainer completed successfully.
+                Model path: {model_trainer_artifact.trained_model_file_path}
+                Train Accuracy: {model_trainer_artifact.train_metric_artifact.accuracy_score}
+                Test Accuracy: {model_trainer_artifact.test_metric_artifact.accuracy_score}
+                """)
             return model_trainer_artifact
         except Exception as e:
             logger.error("Error!, Model trainer failed", exc_info=True)
