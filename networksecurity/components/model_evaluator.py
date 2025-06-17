@@ -17,6 +17,9 @@ from networksecurity.constant.training_pipeline import MODEL_CONFIG_FILE_NAME  #
 from mlflow.models.signature import infer_signature  
 import joblib  # Used to load or save trained models
 import dagshub
+import yaml
+
+# Initialize DagsHub tracking
 dagshub.init(repo_owner='iyan-coder', repo_name='networksecurity', mlflow=True)
 
 class ModelEvaluator:
@@ -127,6 +130,14 @@ class ModelEvaluator:
             # === TRAIN MODE ===
             else:
                 logger.info("Training and evaluating models...")
+                with open(MODEL_CONFIG_FILE_NAME, "r") as yaml_file:
+                    model_yaml = yaml.safe_load(yaml_file)
+
+                    # Log all hyperparameter spaces
+                for model_name, model_data in model_yaml.get("models", {}).items():
+                    for param_name, values in model_data.get("params", {}).items():
+                        mlflow.log_param(f"{model_name}_{param_name}_space", str(values))
+
 
                 # Train all models and collect scores
                 model_report, trained_models = evaluate_models(

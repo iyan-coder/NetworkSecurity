@@ -14,7 +14,8 @@ from networksecurity.exception.exception import NetworkSecurityException  # Cust
 from networksecurity.constant.training_pipeline import TARGET_COLUMN  # The name of the column we're predicting
 import dagshub
 dagshub.init(repo_owner='iyan-coder', repo_name='networksecurity', mlflow=True)
-
+# mlflow.set_registry_uri("https://dagshub.com/iyan-coder/networksecurity.mlflow")
+#         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
 
 # ModelTrainer handles training and saving the best ML model
 class ModelTrainer:
@@ -92,11 +93,11 @@ class ModelTrainer:
         """
         try:
             logger.info("Loading transformed train and test data...")
-            with mlflow.start_run(run_name="Model_Training_Pipeline"):
+            
 
-                # Log basic params
-                mlflow.log_param("pipeline_step", "ModelTrainer")
-                mlflow.log_param("model_storage_path", self.model_trainer_config.trained_model_file_path)
+            # Log basic params
+            mlflow.log_param("pipeline_step", "ModelTrainer")
+            mlflow.log_param("model_storage_path", self.model_trainer_config.trained_model_file_path)
 
             # Load the CSV files containing transformed data
             train_df = self.read_data(self.data_transformation_artifact.transformed_train_file_path)

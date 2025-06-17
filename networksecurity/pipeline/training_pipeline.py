@@ -48,8 +48,6 @@ class TrainingPipeline:
 
     def start_data_ingestion(self):
         try:
-            mlflow.set_experiment("NetworkSecurityModelTraining")
-            
             self.data_ingestion_config = DataIngestionConfig(training_pipeline_config=self.training_pipeline_config)
             logger.info("start data Ingestion")
             data_ingestion = DataIngestion(data_ingestion_config=self.data_ingestion_config)
@@ -124,13 +122,21 @@ class TrainingPipeline:
 
     def run_training_pipeline(self):
         try:
-            data_ingestion_artifact = self.start_data_ingestion()
-            data_validation_artifact = self.start_data_validation(data_ingestion_artifact )
-            data_transformation_artifact = self.start_data_transfomation(data_validation_artifact)
-            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact )
-            self.sync_artifact_dir_to_s3()
-            self.sync_saved_model_dir_to_s3()
-            logger.info("Run pipeline completed")
+            mlflow.set_experiment("NetworkSecurityModelTraining")
+            mlflow.autolog(disable=True) 
+        
+            with mlflow.start_run(run_name="Full_Training_Pipeline") as run:
+                run_id = run.info.run_id
+                logger.info(f"MLflow run started with run_id: {run_id}")
+
+                data_ingestion_artifact = self.start_data_ingestion()
+                data_validation_artifact = self.start_data_validation(data_ingestion_artifact )
+                data_transformation_artifact = self.start_data_transfomation(data_validation_artifact)
+                model_trainer_artifact = self.start_model_trainer(data_transformation_artifact )
+
+                self.sync_artifact_dir_to_s3()
+                self.sync_saved_model_dir_to_s3()
+                logger.info("Run pipeline completed")
             return model_trainer_artifact
         
         except Exception as e:
