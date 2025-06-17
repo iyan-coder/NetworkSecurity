@@ -93,20 +93,26 @@ cd networksecurity
 python -m venv venv
 venv\Scripts\activate   # or source venv/bin/activate on Linux/Mac
 pip install -r requirements.txt
-
 python main.py
 mlflow ui
 # Then open http://localhost:5000 in your browser
 uvicorn app:app --reload
 # Open browser: http://127.0.0.1:8000/docs
+```
 
+---
 
-Future Improvements
-  Dockerization
-  Unit tests for each component
-  Model explainability with SHAP
-  Dashboards with Streamlit
+## Future Improvements
 
-Author
-    Adebayo Gabriel – ML Engineer
-    Connect on https://github.com/iyan-coder | www.linkedin.com/in/gabriel-adebayo-2a0ba2281
+-  **Dockerization** – Containerize the entire project for consistent deployment  
+-  **Unit Tests** – Add testing for each pipeline component and utility function  
+-  **Model Explainability** – Integrate SHAP to explain feature importance  
+-  **Streamlit Dashboard** – Build an interactive UI for real-time prediction and insights  
+
+---
+
+##  Author
+
+**Adebayo Gabriel** – ML Engineer  
+🔗 [GitHub](https://github.com/iyan-coder) | [LinkedIn](https://www.linkedin.com/in/gabriel-adebayo-2a0ba2281)
+
