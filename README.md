@@ -130,15 +130,14 @@ flowchart LR
 6. **Model Pushing** (saved locally and/or to AWS S3)  
 
 ```mermaid
-%%{init: {'theme':'default', 'themeVariables': { 'fontSize': '18px'}, 'logLevel': 'debug'}}%%
-flowchart TD
-    A[Data Ingestion] --> B[Data Validation (schema\nnulls\nranges)]
-    B --> C[Data Transformation (feature eng.\nscaling\nencoding)]
-    C --> D[Model Training (LogReg\nXGBoost\nRandomForest)]
-    D --> E[Evaluation (Accuracy\nPrecision\nRecall\nF1\nROC-AUC)]
-    E --> F[MLflow Logging (params\nmetrics\nartifacts)]
-    F --> G[Model Registry/Artifacts (S3 + mlruns/)]
-    G --> H[(Optional) API Serving (Docker on EC2)]
+flowchart LR
+    A[Data Ingestion: CSV, Database, API] --> B[Data Validation: Schema, Nulls, Ranges]
+    B --> C[Data Transformation: Encoding, Scaling, Feature Engg.]
+    C --> D[Model Training: ML Classifier]
+    D --> E[Model Evaluation: Metrics, Validation]
+    E --> F[Model Registry: MLflow Tracking]
+    F --> G[Deployment: FastAPI + Docker]
+    G --> H[Monitoring & Logging: Performance + Errors]
 
 
  ```
