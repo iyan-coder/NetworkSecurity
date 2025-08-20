@@ -11,6 +11,7 @@
   <img src="https://img.shields.io/badge/AWS-S3%20%7C%20ECR%20%7C%20EC2-232F3E?logo=amazon-aws&logoColor=white" />
   <img src="https://img.shields.io/badge/GitHub%20Actions-CI%2FCD-181717?logo=githubactions&logoColor=white" />
   <img src="https://img.shields.io/badge/DagsHub-Remote%20Tracking-F79F1A?logo=git&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-Database-47A248?logo=mongodb&logoColor=white" />
 </p>
 
 A complete end-to-end **Machine Learning** project that detects phishing websites using supervised learning.  
@@ -69,7 +70,7 @@ networksecurity/
 
 | Feature                   | Technology Used                                |
 | ------------------------- | ---------------------------------------------- |
-| Data Handling             | `pandas`, `numpy`                              |
+| Data Handling             | `pandas`, `numpy`, MongoDB                              |
 | Modeling                  | `scikit-learn` (LogReg, RF), `xgboost`         |
 | Tracking & Versioning     | `MLflow` (local/remote), `DagsHub`             |
 | Pipeline Architecture     | Modular, OOP-based                             |
@@ -102,17 +103,22 @@ flowchart LR
     E -->|Pull & Run| F[AWS EC2 Service]
 
     subgraph Data & Tracking
-      G[(AWS S3<br/>Data & Artifacts)]
+      G[(AWS S3: Data & Artifacts)]
+      J[(MongoDB: Features & Logs)]
       H[MLflow Tracking Server]
       I[DagsHub Remote Tracking]
     end
 
     A --> G
+    A --> J
     C --> G
     F --> G
+    F --> J
     H <-->|Log Params/Metrics/Artifacts| C
     H --> I
+
     style G fill:#f6f8fa,stroke:#888
+    style J fill:#e8f5e9,stroke:#47A248
     style H fill:#e3f2fd,stroke:#1e88e5
     style I fill:#fff3e0,stroke:#fb8c00
 ```
