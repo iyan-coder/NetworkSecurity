@@ -87,6 +87,7 @@ networksecurity/
 # 🚀 Live Pipeline Diagram
 
 ```mermaid
+%%{init: {'theme':'default', 'themeVariables': { 'fontSize': '18px'}, 'logLevel': 'debug'}}%%
 flowchart LR
     subgraph Dev[Developer Workflow]
       A[Code & Notebooks] --> B[Git Commit/Push]
@@ -125,6 +126,8 @@ flowchart LR
 5. **Model Evaluation** (metrics + artifacts logged to MLflow)  
 6. **Model Pushing** (saved locally and/or to AWS S3)  
 
+```mermaid
+%%{init: {'theme':'default', 'themeVariables': { 'fontSize': '18px'}, 'logLevel': 'debug'}}%%
 flowchart TD
     A[Data Ingestion] --> B[Data Validation<br/>(schema, nulls, ranges)]
     B --> C[Data Transformation<br/>(feature eng., scaling, encoding)]
@@ -133,7 +136,8 @@ flowchart TD
     E --> F[MLflow Logging<br/>params, metrics, artifacts]
     F --> G[Model Registry/Artifacts<br/>S3 + mlruns/]
     G --> H[(Optional) API Serving<br/>Docker on EC2]
- 
+
+ ```
 
 ---
 
