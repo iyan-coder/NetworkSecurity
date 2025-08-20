@@ -84,6 +84,9 @@ networksecurity/
 - **Automation:** GitHub Actions for CI/CD (build, test, tag, push)  
 - **Observability:** Custom `logger/` + `exception/` modules  
 
+# 🚀 Live Pipeline Diagram
+
+```mermaid
 flowchart LR
     subgraph Dev[Developer Workflow]
       A[Code & Notebooks] --> B[Git Commit/Push]
@@ -108,11 +111,8 @@ flowchart LR
     style G fill:#f6f8fa,stroke:#888
     style H fill:#e3f2fd,stroke:#1e88e5
     style I fill:#fff3e0,stroke:#fb8c00
-    
-<p align="center">
-  <img src="A_flowchart_in_the_image_illustrates_an_end-to-end.png" alt="Pipeline Infrastructure Diagram" width="700"/>
-</p>
-
+```
+  
 ---
 ---
 
@@ -158,9 +158,6 @@ flowchart TD
 **Why Recall matters:**  
 ⚠️ Missing a phishing site (**false negative**) is riskier than a false positive.  
 👉 **Random Forest** was chosen for the best Recall/F1 balance.  
-
-📈 **Live performance chart:**  
-*(add chart.png here if available)*  
 
 ---
 
@@ -216,9 +213,8 @@ mlflow ui   # open http://127.0.0.1:5000
 ## 👤 Author
 **Adebayo Gabriel** – ML Engineer (**AI × Cybersecurity**)  
 
-## 🔗 Links
-- **GitHub**  
-- **LinkedIn**  
+## 🔗 Links 
+📧 iyanuoluwaadebayo04@gmail.com | 🌐 [LinkedIn](https://www.linkedin.com/in/gabriel-adebayo-2a0ba2281) | [GitHub](https://github.com/iyan-coder)  
 
 ---
 
