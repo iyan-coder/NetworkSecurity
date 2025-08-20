@@ -130,6 +130,7 @@ flowchart LR
 6. **Model Pushing** (saved locally and/or to AWS S3)  
 
 ```mermaid
+%%{init: {'theme':'default', 'themeVariables': { 'fontSize': '18px'}, 'logLevel': 'debug'}}%%
 flowchart LR
     A[Data Ingestion: CSV, Database, API] --> B[Data Validation: Schema, Nulls, Ranges]
     B --> C[Data Transformation: Encoding, Scaling, Feature Engg.]
