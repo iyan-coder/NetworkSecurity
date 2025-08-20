@@ -1,4 +1,7 @@
-#  Network Security – Phishing Website Detection 🔍
+# Intelligent Phishing Detection System 🔒  
+
+> An end-to-end ML-powered solution for securing networks against phishing attacks.  
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white" />
@@ -129,13 +132,14 @@ flowchart LR
 ```mermaid
 %%{init: {'theme':'default', 'themeVariables': { 'fontSize': '18px'}, 'logLevel': 'debug'}}%%
 flowchart TD
-    A[Data Ingestion] --> B[Data Validation<br/>(schema, nulls, ranges)]
-    B --> C[Data Transformation<br/>(feature eng., scaling, encoding)]
-    C --> D[Model Training<br/>(LogReg, XGBoost, RandomForest)]
-    D --> E[Evaluation<br/>Accuracy/Precision/Recall/F1/ROC-AUC]
-    E --> F[MLflow Logging<br/>params, metrics, artifacts]
-    F --> G[Model Registry/Artifacts<br/>S3 + mlruns/]
-    G --> H[(Optional) API Serving<br/>Docker on EC2]
+    A[Data Ingestion] --> B[Data Validation (schema\nnulls\nranges)]
+    B --> C[Data Transformation (feature eng.\nscaling\nencoding)]
+    C --> D[Model Training (LogReg\nXGBoost\nRandomForest)]
+    D --> E[Evaluation (Accuracy\nPrecision\nRecall\nF1\nROC-AUC)]
+    E --> F[MLflow Logging (params\nmetrics\nartifacts)]
+    F --> G[Model Registry/Artifacts (S3 + mlruns/)]
+    G --> H[(Optional) API Serving (Docker on EC2)]
+
 
  ```
 
